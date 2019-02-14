@@ -17,6 +17,7 @@
 package com.alibaba.fescar.tm.dubbo.impl;
 
 import com.alibaba.fescar.core.context.RootContext;
+import com.alibaba.fescar.spring.annotation.GlobalTransactional;
 import com.alibaba.fescar.test.common.ApplicationKeeper;
 import com.alibaba.fescar.tm.dubbo.StorageService;
 
@@ -42,6 +43,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @GlobalTransactional
     public void deduct(String commodityCode, int count) {
         LOGGER.info("Storage Service Begin ... xid: " + RootContext.getXID());
         LOGGER.info("Deducting inventory SQL: update storage_tbl set count = count - {} where commodity_code = {}",

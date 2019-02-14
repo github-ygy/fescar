@@ -16,17 +16,6 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.alibaba.fescar.common.XID;
 import com.alibaba.fescar.common.exception.FrameworkErrorCode;
 import com.alibaba.fescar.common.exception.FrameworkException;
@@ -40,7 +29,6 @@ import com.alibaba.fescar.core.protocol.HeartbeatMessage;
 import com.alibaba.fescar.core.protocol.RegisterRMRequest;
 import com.alibaba.fescar.core.protocol.RegisterRMResponse;
 import com.alibaba.fescar.core.rpc.netty.NettyPoolKey.TransactionRole;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -49,6 +37,11 @@ import io.netty.util.concurrent.EventExecutorGroup;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.alibaba.fescar.common.Constants.DBKEYS_SPLIT_CHAR;
 
@@ -536,5 +529,4 @@ public final class RmRpcClient extends AbstractRpcRemotingClient {
             LOGGER.error("return channel to rmPool error:" + exx.getMessage());
         }
     }
-
 }

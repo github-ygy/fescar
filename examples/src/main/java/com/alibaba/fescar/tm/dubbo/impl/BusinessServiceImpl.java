@@ -40,13 +40,11 @@ public class BusinessServiceImpl implements BusinessService {
     private OrderService orderService;
 
     @Override
-    @GlobalTransactional(timeoutMills = 300000, name = "dubbo-demo-tx")
+    @GlobalTransactional(timeoutMills = 3000000, name = "dubbo-demo-tx")
     public void purchase(String userId, String commodityCode, int orderCount) {
         LOGGER.info("purchase begin ... xid: " + RootContext.getXID());
         storageService.deduct(commodityCode, orderCount);
         orderService.create(userId, commodityCode, orderCount);
-        throw new RuntimeException("xxx");
-
     }
 
     public void setStorageService(StorageService storageService) {

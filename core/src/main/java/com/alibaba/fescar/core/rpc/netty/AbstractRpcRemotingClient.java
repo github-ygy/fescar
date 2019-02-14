@@ -16,37 +16,19 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.alibaba.fescar.common.exception.FrameworkErrorCode;
 import com.alibaba.fescar.common.exception.FrameworkException;
 import com.alibaba.fescar.common.thread.NamedThreadFactory;
 import com.alibaba.fescar.common.util.NetUtil;
-import com.alibaba.fescar.core.protocol.AbstractMessage;
-import com.alibaba.fescar.core.protocol.HeartbeatMessage;
-import com.alibaba.fescar.core.protocol.MergeResultMessage;
-import com.alibaba.fescar.core.protocol.MergedWarpMessage;
-import com.alibaba.fescar.core.protocol.MessageFuture;
-import com.alibaba.fescar.core.protocol.RpcMessage;
+import com.alibaba.fescar.core.protocol.*;
 import com.alibaba.fescar.core.rpc.ClientMessageListener;
 import com.alibaba.fescar.core.rpc.ClientMessageSender;
 import com.alibaba.fescar.core.rpc.RemotingService;
 import com.alibaba.fescar.core.rpc.netty.NettyPoolKey.TransactionRole;
-
 import com.alibaba.fescar.core.service.ServiceManager;
 import com.alibaba.fescar.core.service.ServiceManagerStaticConfigImpl;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollMode;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -63,6 +45,12 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The type Rpc remoting client.
@@ -264,9 +252,9 @@ public abstract class AbstractRpcRemotingClient extends AbstractRpcRemoting
         if (msg instanceof RpcMessage) {
             RpcMessage rpcMessage = (RpcMessage)msg;
             if (rpcMessage.getBody() == HeartbeatMessage.PONG) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("received PONG from " + ctx.channel().remoteAddress());
-                }
+                //if (LOGGER.isDebugEnabled()) {
+                //    LOGGER.debug("received PONG from " + ctx.channel().remoteAddress());
+                //}
                 return;
             }
         }
@@ -357,6 +345,7 @@ public abstract class AbstractRpcRemotingClient extends AbstractRpcRemoting
         @Override
         public void run() {
             while (true) {
+
                 synchronized (mergeLock) {
                     try {
                         mergeLock.wait(MAX_MERGE_SEND_MILLS);

@@ -16,29 +16,15 @@
 
 package com.alibaba.fescar.core.rpc;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.alibaba.fescar.common.thread.NamedThreadFactory;
 import com.alibaba.fescar.common.util.NetUtil;
-import com.alibaba.fescar.core.protocol.AbstractMessage;
-import com.alibaba.fescar.core.protocol.AbstractResultMessage;
-import com.alibaba.fescar.core.protocol.HeartbeatMessage;
-import com.alibaba.fescar.core.protocol.MergeResultMessage;
-import com.alibaba.fescar.core.protocol.MergedWarpMessage;
-import com.alibaba.fescar.core.protocol.RegisterRMRequest;
-import com.alibaba.fescar.core.protocol.RegisterRMResponse;
-import com.alibaba.fescar.core.protocol.RegisterTMRequest;
-import com.alibaba.fescar.core.protocol.RegisterTMResponse;
-import com.alibaba.fescar.core.protocol.Version;
+import com.alibaba.fescar.core.protocol.*;
 import com.alibaba.fescar.core.rpc.netty.RegisterCheckAuthHandler;
-
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.*;
 
 /**
  * The type Default server message listener.
@@ -73,9 +59,9 @@ public class DefaultServerMessageListenerImpl implements ServerMessageListener {
     public void onTrxMessage(long msgId, ChannelHandlerContext ctx, Object message, ServerMessageSender sender) {
         RpcContext rpcContext = ChannelManager.getContextFromIdentified(ctx.channel());
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(
-                "server received:" + message + ",clientIp:" + NetUtil.toIpAddress(ctx.channel().remoteAddress())
-                    + ",vgroup:" + rpcContext.getTransactionServiceGroup());
+            //LOGGER.debug(
+            //    "server received:" + message + ",clientIp:" + NetUtil.toIpAddress(ctx.channel().remoteAddress())
+            //        + ",vgroup:" + rpcContext.getTransactionServiceGroup());
         } else {
             messageStrings.offer(
                 message + ",clientIp:" + NetUtil.toIpAddress(ctx.channel().remoteAddress()) + ",vgroup:" + rpcContext
@@ -127,11 +113,11 @@ public class DefaultServerMessageListenerImpl implements ServerMessageListener {
             if (null == checkAuthHandler || checkAuthHandler.regTransactionManagerCheckAuth(message)) {
                 ChannelManager.registerTMChannel(message, ctx.channel());
                 Version.putChannelVersion(ctx.channel(), message.getVersion());
-                isSuccess = true;
+                isSuccess=true;
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info(String
-                        .format("checkAuth for client:%s vgroup:%s ok", ipAndPort,
-                            message.getTransactionServiceGroup()));
+                            .format("checkAuth for client:%s vgroup:%s ok", ipAndPort,
+                                    message.getTransactionServiceGroup()));
                 }
             }
         } catch (Exception exx) {
@@ -149,9 +135,9 @@ public class DefaultServerMessageListenerImpl implements ServerMessageListener {
         } catch (Throwable throwable) {
             LOGGER.error("", "send response error", throwable);
         }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("received PING from " + ctx.channel().remoteAddress());
-        }
+        //if (LOGGER.isDebugEnabled()) {
+        //    LOGGER.debug("received PING from " + ctx.channel().remoteAddress());
+        //}
     }
 
     /**

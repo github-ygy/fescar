@@ -16,19 +16,12 @@
 
 package com.alibaba.fescar.spring.annotation;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
 import com.alibaba.fescar.common.exception.NotSupportYetException;
 import com.alibaba.fescar.config.ConfigurationFactory;
 import com.alibaba.fescar.rm.RMClientAT;
 import com.alibaba.fescar.tm.TMClient;
 import com.alibaba.fescar.tm.api.DefaultFailureHandlerImpl;
 import com.alibaba.fescar.tm.api.FailureHandler;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +32,12 @@ import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * The type Global transaction scanner.
@@ -255,6 +254,7 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator implement
             }
             return;
         }
+        //初始化客户端
         initClient();
 
     }

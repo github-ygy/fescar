@@ -34,4 +34,10 @@ public class TMClient {
         tmRpcClient.init();
     }
 
+    public static void main(String[] args) {
+        init("test","test-group");
+        System.out.println("结束了");
+
+    }
+
 }

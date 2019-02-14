@@ -16,21 +16,12 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeoutException;
-
 import com.alibaba.fescar.common.util.NetUtil;
 import com.alibaba.fescar.core.protocol.HeartbeatMessage;
 import com.alibaba.fescar.core.protocol.RegisterRMRequest;
 import com.alibaba.fescar.core.protocol.RegisterTMRequest;
 import com.alibaba.fescar.core.protocol.RpcMessage;
-import com.alibaba.fescar.core.rpc.ChannelManager;
-import com.alibaba.fescar.core.rpc.DefaultServerMessageListenerImpl;
-import com.alibaba.fescar.core.rpc.RpcContext;
-import com.alibaba.fescar.core.rpc.ServerMessageListener;
-import com.alibaba.fescar.core.rpc.ServerMessageSender;
-import com.alibaba.fescar.core.rpc.TransactionMessageHandler;
-
+import com.alibaba.fescar.core.rpc.*;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -38,6 +29,9 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The type Abstract rpc server.
@@ -131,7 +125,6 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
         defaultServerMessageListenerImpl.setServerMessageSender(this);
         this.setServerMessageListener(defaultServerMessageListenerImpl);
         super.start();
-
     }
 
     private void closeChannelHandlerContext(ChannelHandlerContext ctx) {
@@ -252,7 +245,9 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
             serverMessageListener.onRegRmMessage(msgId, ctx, (RegisterRMRequest)msg, this,
                 checkAuthHandler);
         } else {
+            //如果是已注册成功的channel
             if (ChannelManager.isRegistered(ctx.channel())) {
+                //处理事务消息
                 serverMessageListener.onTrxMessage(msgId, ctx, msg, this);
             } else {
                 try {
@@ -312,7 +307,7 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
     public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof RpcMessage) {
             RpcMessage rpcMessage = (RpcMessage)msg;
-            debugLog("read:" + rpcMessage.getBody().toString());
+            //debugLog("read:" + rpcMessage.getBody().toString());
             if (rpcMessage.getBody() instanceof RegisterTMRequest) {
                 RegisterTMRequest request
                     = (RegisterTMRequest)rpcMessage

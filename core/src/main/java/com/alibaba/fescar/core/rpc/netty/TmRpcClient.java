@@ -16,15 +16,6 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.alibaba.fescar.common.XID;
 import com.alibaba.fescar.common.exception.FrameworkErrorCode;
 import com.alibaba.fescar.common.exception.FrameworkException;
@@ -34,10 +25,8 @@ import com.alibaba.fescar.config.Configuration;
 import com.alibaba.fescar.config.ConfigurationFactory;
 import com.alibaba.fescar.core.context.RootContext;
 import com.alibaba.fescar.core.protocol.*;
-import com.alibaba.fescar.core.protocol.RegisterTMRequest;
 import com.alibaba.fescar.core.protocol.transaction.GlobalBeginResponse;
 import com.alibaba.fescar.core.rpc.netty.NettyPoolKey.TransactionRole;
-
 import com.alibaba.fescar.core.service.ConfigurationKeys;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -48,6 +37,9 @@ import io.netty.util.concurrent.EventExecutorGroup;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.alibaba.fescar.common.exception.FrameworkErrorCode.NoAvailableService;
 
@@ -148,6 +140,7 @@ public final class TmRpcClient extends AbstractRpcRemotingClient {
      */
     public void init(long healthCheckDelay, long healthCheckPeriod) {
         initVars();
+        //todo 为何不关闭资源
         ExecutorService mergeSendExecutorService = new ThreadPoolExecutor(MAX_MERGE_SEND_THREAD, MAX_MERGE_SEND_THREAD,
             KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
             new NamedThreadFactory(getThreadPrefix(MERGE_THREAD_PREFIX), MAX_MERGE_SEND_THREAD));
@@ -161,7 +154,8 @@ public final class TmRpcClient extends AbstractRpcRemotingClient {
                     LOGGER.error(ignore.getMessage());
                 }
             }
-        }, healthCheckDelay, healthCheckPeriod, TimeUnit.SECONDS);
+        }, 0, 2, TimeUnit.SECONDS);
+
     }
 
     private void reconnect() {
@@ -241,7 +235,7 @@ public final class TmRpcClient extends AbstractRpcRemotingClient {
             if (idleStateEvent == IdleStateEvent.WRITER_IDLE_STATE_EVENT) {
                 try {
                     if (LOGGER.isInfoEnabled()) {
-                        LOGGER.info("will send ping msg,channel" + ctx.channel());
+                        //LOGGER.info("will send ping msg,channel" + ctx.channel());
                     }
                     sendRequest(ctx.channel(), HeartbeatMessage.PING);
                 } catch (Throwable throwable) {

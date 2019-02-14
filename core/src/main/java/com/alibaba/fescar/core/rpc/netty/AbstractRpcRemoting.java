@@ -16,23 +16,6 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import com.alibaba.fescar.common.exception.FrameworkErrorCode;
 import com.alibaba.fescar.common.exception.FrameworkException;
 import com.alibaba.fescar.common.thread.NamedThreadFactory;
@@ -40,16 +23,18 @@ import com.alibaba.fescar.core.protocol.HeartbeatMessage;
 import com.alibaba.fescar.core.protocol.MergeMessage;
 import com.alibaba.fescar.core.protocol.MessageFuture;
 import com.alibaba.fescar.core.protocol.RpcMessage;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.*;
 
 /**
  * The type Abstract rpc remoting.
@@ -293,10 +278,10 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
             mergeMsgMap.put(rpcMessage.getId(), (MergeMessage)msg);
         }
         channelWriteableCheck(channel, msg);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("write message:" + rpcMessage.getBody() + ", channel:" + channel + ",active?"
-                + channel.isActive() + ",writable?" + channel.isWritable() + ",isopen?" + channel.isOpen());
-        }
+        //if (LOGGER.isDebugEnabled()) {
+        //    LOGGER.debug("write message:" + rpcMessage.getBody() + ", channel:" + channel + ",active?"
+        //        + channel.isActive() + ",writable?" + channel.isWritable() + ",isopen?" + channel.isOpen());
+        //}
         channel.writeAndFlush(rpcMessage);
     }
 
@@ -315,9 +300,9 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
         rpcMessage.setBody(msg);
         rpcMessage.setId(msgId);
         channelWriteableCheck(channel, msg);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("send response:" + rpcMessage.getBody() + ",channel:" + channel);
-        }
+        //if (LOGGER.isDebugEnabled()) {
+        //    LOGGER.debug("send response:" + rpcMessage.getBody() + ",channel:" + channel);
+        //}
         channel.writeAndFlush(rpcMessage);
     }
 
